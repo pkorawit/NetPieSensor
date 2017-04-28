@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html lang="">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>NETPIE Demo</title>
+
+		<!-- Bootstrap CSS -->
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+	</head>
+	<body>
+		<div class="container">	
+	
+		<div id="data"></div>
+		<div id="esp8266">
+			<div id="temp" class="200x160px"></div>
+			<div id="humid" class="200x160px"></div>
+		</div>
+		</div>
+		<!-- jQuery -->
+		<script src="https://code.jquery.com/jquery.js"></script>
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+		<script src="https://netpie.io/microgear.js"></script>
+		<script src="js/raphael-2.1.4.min.js"></script>
+		<script src="js/justgage.js"></script>
+		<script>
+			
+			var temp = new JustGage({
+				id: "temp", 
+				value: 0, 
+				min: 0,
+				max: 100,
+				title: "TEMPERATURE",
+				label: "Degree Celsius",
+				showMinMax: false 
+			});
+
+			var humid = new JustGage({
+				id: "humid", 
+				value: 0, 
+				min: 0,
+				max: 100,
+				title: "HUMIDITY",
+				label: "%"
+			});
+			
+			const APPKEY = "vXto18AcprkiedP";
+			const APPSECRET = "X5DFIZGJEGHmS6ukEFkGxf1hO";
+			const APPID = "DemoSmartOffice";
+
+			var url = "https://script.google.com/macros/s/AKfycby94xukAry0FMQLyNZVmlPQ0HoGmw1-h0bWYu6SB807KdUBSTw/exec?";
+
+			var microgear = Microgear.create({
+				gearkey: APPKEY,
+				gearsecret: APPSECRET
+			});
+
+			var x=0,timestamp=0;
+			var msg_count = 0;
+			microgear.on('message',function(topic,msg) {
+				
+				var split_msg = msg.split(",");
+				var timestamp_current = new Date().getTime();
+
+				if(split_msg[2] == "esp8266"){
+
+						temp.refresh(split_msg[0]);
+						humid.refresh(split_msg[1])
+						console.log(split_msg[0] + "," + split_msg[1]);				
+						msg_count++;
+						console.log(msg_count);
+				}
+
+				if(msg_count % 60 == 0){
+					//Upload data to google sheet				
+					var params = "tempData=" + split_msg[0] + "&" + "humidityData=" + split_msg[1];
+					$.getJSON(url+params, function(response, status){
+						//console.log(response);
+					});
+					msg_count = 0;
+				}
+
+
+			});
+
+			microgear.on('connected', function() {
+				microgear.setname('webapp');
+				document.getElementById("data").innerHTML = '<p align="center"><img src="img/nectec_logo.png" id="nectec" onclick="location.reload()"></p>';
+			});
+			
+			microgear.resettoken();
+			microgear.connect(APPID);
+		</script>	
+			
+	</body>
+</html>
+
+
+
+
+
+
+
+

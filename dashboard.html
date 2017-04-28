@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Title Page</title>
+
+        <!-- Bootstrap CSS -->
+        <link href="https://netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+
+
+    </head>
+    <body>
+        <h1 class="text-center">Hello World</h1>
+        
+        <input type="text" name="" id="input1" class="form-control" value="" required="required" pattern="" title="">
+        
+        <button type="button" id="insert" class="btn btn-default">button</button>
+        
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery.js"></script>
+        <!-- Bootstrap JavaScript -->
+        <script src="https://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+        <script src="https://cdn.netpie.io/microgear.js"></script>
+        <script>
+            $("#insert").click(function(){
+                var sheeturl = "https://sheets.googleapis.com/v4/spreadsheets/1IhSYoUWszmd_pcB1RD0UcowVNwUS40jebY0rUUydOi4/DHT22!A3:A4";
+                sheeturl += "?valueInputOption=USER_ENTERED";
+                $.ajax({
+                url: sheeturl,
+                type: 'PUT',
+                data: {
+                            "values": [
+                                [
+                                    99
+                                ],
+                                [
+                                    100
+                                ]
+                            ]
+                        },
+                success: function(data) {
+                    alert('Load was performed.');
+                }
+                });
+            });
+        </script>
+    </body>
+</html>
